@@ -1,34 +1,30 @@
-'use client'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+"use client";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-interface BlogDetailsProps {
-  params: { id: string };
-}
+export default function BlogDetails() {
+  const { id } : any = useParams(); // Get dynamic ID from URL
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-function page({params}: BlogDetailsProps) {
+  useEffect(() => {
+    axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`)
+      .then((res) => {
+        setPost(res.data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
 
-  const [post, setPosts] = useState<any>()
-  const [loading, setLoading] = useState<boolean>(true)
-
-  useEffect(()=>{
-    axios.get(`https://jsonplaceholder.typicode.com/posts/${params.id}`)
-    .then(res=> setPosts(res.data))
-    setLoading(false)
-  },[])
-
-  console.log(post);
-  
+  if (loading) return <p>Loading...</p>;
+  if (!post) return <p>Blog not found</p>;
 
   return (
-    <div className='w-full mt-[20px]'>
-      <div className='p-[10px] border-2 border-black rounded-md w-[80%] mx-auto'>
-        <h1 className='text-3xl font-bold'>{post?.title}</h1>
-        <p>{post?.body}</p>
-        <p className='text-3xl font-bold'>{loading? "Loading...": ""}</p>
-      </div>
+    <div className="p-10">
+      <h1 className="text-4xl font-bold">{post.title}</h1>
+      <p className="text-lg mt-4">{post.body}</p>
+      <a href="/" className="text-blue-500 mt-5 block">← Back to Home</a>
     </div>
-  )
+  );
 }
-
-export default page
